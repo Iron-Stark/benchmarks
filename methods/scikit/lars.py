@@ -38,14 +38,8 @@ class LARS(object):
     self.verbose = verbose
     self.dataset = dataset
     self.timeout = timeout
-    self.fit_intercept = True
-    self.normalize = True
-    self.precompute = 'auto'
     self.max_iter1 = 500
     self.eps1=2.2204460492503131e-16
-    self.copy_X = True
-    self.fit_path = True
-    self.positive = False
     self.alpha = 1.0
   '''
   Use the scikit libary to implement Least Angle Regression.
