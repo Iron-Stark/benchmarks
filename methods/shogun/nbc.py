@@ -112,7 +112,7 @@ class NBC(object):
       # Check if we need to create a model.
       if not self.model:
         trainData, responses = SplitTrainData(self.dataset)
-        self.model = self.BuildModel(trainData, responses)
+        self.model = self.BuildModel(trainData, responses, options)
 
       if self.predictions:
         testData = LoadDataset(self.dataset[1])
