@@ -76,7 +76,7 @@ class NBC(object):
           nbc.train()
 
           # Run Naive Bayes Classifier on the test dataset.
-          nbc.apply(testFeat).get_labels()
+          self.predictions = nbc.apply_multiclass(testFeat)
       except Exception as e:
         q.put(-1)
         return -1
@@ -113,7 +113,8 @@ class NBC(object):
       if not self.model:
         trainData, responses = SplitTrainData(self.dataset)
         self.model = self.BuildModel(trainData, responses, options)
-
+        self.predictions = self.model.apply_multiclass(RealFeatures(testData.T))
+      
       if self.predictions:
         testData = LoadDataset(self.dataset[1])
         truelabels = LoadDataset(self.dataset[2])
