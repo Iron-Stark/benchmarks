@@ -56,10 +56,9 @@ class RANDOMFOREST(object):
   '''
   def BuildModel(self, data, labels, options):
     mVote = MajorityVote()
-    randomForest = RandomForest(self.form,self.numTrees)
+    randomForest = RandomForest(data, labels, self.numTrees)
     randomForest.set_combination_rule(mVote)
-    randomForest.set_labels(labels)
-    randomForest.train(data)
+    randomForest.train()
 
     return randomForest
 
@@ -91,7 +90,7 @@ class RANDOMFOREST(object):
         with totalTimer:
           self.model = self.BuildModel(trainData, labels, options)
           # Run the Random Forest Classifier on the test dataset.
-          self.model.apply_multiclass(testData).get_labels()
+          self.predictions = self.model.apply_multiclass(testData)
       except Exception as e:
         q.put(-1)
         return -1
@@ -123,7 +122,8 @@ class RANDOMFOREST(object):
        if not self.model:
          trainData, responses = SplitTrainData(self.dataset)
          self.model = self.BuildModel(trainData, responses, options)
-
+         self.predictions = self.model.apply_multiclass(testData)
+        
        if self.predictions:
         testData = LoadDataset(self.dataset[1])
         truelabels = LoadDataset(self.dataset[2])
@@ -131,9 +131,12 @@ class RANDOMFOREST(object):
         confusionMatrix = Metrics.ConfusionMatrix(truelabels, self.predictions)
 
         metrics['Avg Accuracy'] = Metrics.AverageAccuracy(confusionMatrix)
-        metrics['Precision'] = Metrics.AvgPrecision(confusionMatrix)
-        metrics['Recall'] = Metrics.AvgRecall(confusionMatrix)
-        metrics['FMeasure'] = Metrics.AvgFMeasure(confusionMatrix)
+        metrics['MultiClass Precision'] = Metrics.AvgPrecision(confusionMatrix)
+        metrics['MultiClass Recall'] = Metrics.AvgRecall(confusionMatrix)
+        metrics['MultiClass FMeasure'] = Metrics.AvgFMeasure(confusionMatrix)
+        metrics['MultiClass Lift'] = Metrics.LiftMultiClass(confusionMatrix)
+        metrics['MultiClass MCC'] = Metrics.MCCMultiClass(confusionMatrix)
+        metrics['MultiClass Information'] = Metrics.AvgMPIArray(confusionMatrix, truelabels, self.predictions)
         metrics['Simple MSE'] = Metrics.SimpleMeanSquaredError(truelabels, self.predictions)
 
       return metrics
