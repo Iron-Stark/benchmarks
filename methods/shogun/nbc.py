@@ -121,14 +121,14 @@ class NBC(object):
 
         confusionMatrix = Metrics.ConfusionMatrix(truelabels, self.predictions)
 
-        metrics['Accuracy'] = Metrics.AverageAccuracy(confusionMatrix)
-        metrics['Precision'] = Metrics.AvgPrecision(confusionMatrix)
-        metrics['Recall'] = Metrics.AvgRecall(confusionMatrix)
-        metrics['FMeasure'] = Metrics.AvgFMeasure(confusionMatrix)
-        metrics['Lift'] = Metrics.LiftMultiClass(confusionMatrix)
-        metrics['MCC'] = Metrics.MCCMultiClass(confusionMatrix)
-        metrics['Information'] = Metrics.AvgMPIArray(confusionMatrix, truelabels, self.predictions)
-        metrics['MSE'] = Metrics.SimpleMeanSquaredError(truelabels, self.predictions)
+        metrics['Avg Accuracy'] = Metrics.AverageAccuracy(confusionMatrix)
+        metrics['MultiClass Precision'] = Metrics.AvgPrecision(confusionMatrix)
+        metrics['MultiClass Recall'] = Metrics.AvgRecall(confusionMatrix)
+        metrics['MultiClass FMeasure'] = Metrics.AvgFMeasure(confusionMatrix)
+        metrics['MultiClass Lift'] = Metrics.LiftMultiClass(confusionMatrix)
+        metrics['MultiClass MCC'] = Metrics.MCCMultiClass(confusionMatrix)
+        metrics['MultiClass Information'] = Metrics.AvgMPIArray(confusionMatrix, truelabels, self.predictions)
+        metrics['Simple MSE'] = Metrics.SimpleMeanSquaredError(truelabels, self.predictions)
 
 
     return metrics
