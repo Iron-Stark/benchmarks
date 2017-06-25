@@ -119,12 +119,12 @@ class RANDOMFOREST(object):
 
       metrics = {'Runtime' : results}
       if len(self.dataset) >= 3:
-      # Check if we need to create a model.
-      if not self.model:
-        trainData, responses = SplitTrainData(self.dataset)
-        self.model = self.BuildModel(trainData, responses)
+       # Check if we need to create a model.
+       if not self.model:
+         trainData, responses = SplitTrainData(self.dataset)
+         self.model = self.BuildModel(trainData, responses)
 
-      if self.predictions:
+       if self.predictions:
         testData = LoadDataset(self.dataset[1])
         truelabels = LoadDataset(self.dataset[2])
 
