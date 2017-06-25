@@ -81,7 +81,7 @@ class DTC(object):
         with totalTimer:
           self.model = self.BuildModel(trainData, labels, options)
           # Run the CARTree Classifier on the test dataset.
-          self.model.apply_multiclass(testData).get_labels()
+          self.predictions = self.model.apply_multiclass(testData)
       except Exception as e:
         q.put(-1)
         return -1
@@ -109,5 +109,29 @@ class DTC(object):
         results = self.DTCShogun(options)
     else:
       Log.Fatal("This method requires at least two datasets.")
+    
+    metrics = {'Runtime' : results}
 
-    return {'Runtime' : results}
+    if len(self.dataset) >= 3:
+      # Check if we need to create a model.
+      if not self.model:
+        trainData, responses = SplitTrainData(self.dataset)
+        self.model = self.BuildModel(trainData, responses)
+        self.predictions = self.model.apply_multiclass(RealFeatures(LoadDataset(self.dataset[1]).T))
+      
+      if self.predictions:
+        testData = LoadDataset(self.dataset[1])
+        truelabels = LoadDataset(self.dataset[2])
+
+        confusionMatrix = Metrics.ConfusionMatrix(truelabels, self.predictions)
+
+        metrics['Avg Accuracy'] = Metrics.AverageAccuracy(confusionMatrix)
+        metrics['MultiClass Precision'] = Metrics.AvgPrecision(confusionMatrix)
+        metrics['MultiClass Recall'] = Metrics.AvgRecall(confusionMatrix)
+        metrics['MultiClass FMeasure'] = Metrics.AvgFMeasure(confusionMatrix)
+        metrics['MultiClass Lift'] = Metrics.LiftMultiClass(confusionMatrix)
+        metrics['MultiClass MCC'] = Metrics.MCCMultiClass(confusionMatrix)
+        metrics['MultiClass Information'] = Metrics.AvgMPIArray(confusionMatrix, truelabels, self.predictions)
+        metrics['Simple MSE'] = Metrics.SimpleMeanSquaredError(truelabels, self.predictions)
+
+    return metrics
