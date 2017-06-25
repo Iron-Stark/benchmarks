@@ -110,19 +110,6 @@ class NBC(object):
 
     if len(self.dataset) == 3:
     # Check if the files to calculate the different metric are available.
-      cmd = shlex.split("methods/shogun/nbc " + self.dataset[0]
-           + " " + self.dataset[1])
-      if not CheckFileAvailable("shogun_labels.csv") or not CheckFileAvailable("shogun_probs.csv"):
-        try:
-          s = subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=False,
-              timeout=self.timeout)
-        except subprocess.TimeoutExpired as e:
-          Log.Warn(str(e))
-          return -2
-        except Exception as e:
-          Log.Fatal("Could not execute command: " + str(cmd))
-          return -1
-
       testData = LoadDataset(self.dataset[1])
       truelabels = LoadDataset(self.dataset[2])
       probabilities = LoadDataset("shogun_probs.csv")
