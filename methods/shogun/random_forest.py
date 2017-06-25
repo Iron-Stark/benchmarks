@@ -56,7 +56,7 @@ class RANDOMFOREST(object):
   '''
   def BuildModel(self, data, labels, options):
     mVote = MajorityVote()
-    randomForest = RandomForest(RealFeatures(data.T), MulticlassLabels(responses), self.numTrees)
+    randomForest = RandomForest(RealFeatures(data.T), MulticlassLabels(labels), self.numTrees)
     randomForest.set_combination_rule(mVote)
     randomForest.train()
 
