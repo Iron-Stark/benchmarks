@@ -28,7 +28,7 @@ from definitions import *
 from misc import *
 
 import numpy as np
-import modshogun
+from modshogun import RealFeatures, MulticlassLabels, QDA
 
 '''
 This class implements the QDA Classifier benchmark.
@@ -62,21 +62,19 @@ class QDA(object):
       try:
         # Load train and test dataset.
         trainData = np.genfromtxt(self.dataset[0], delimiter=',')
-        trainFeat = modshogun.RealFeatures(trainData[:,:-1].T)
-
-        if len(self.dataset) == 2:
-          testSet = np.genfromtxt(self.dataset[1], delimiter=',')
-          testFeat = modshogun.RealFeatures(testData.T)
-
+        testData = np.genfromtxt(self.dataset[1], delimiter=',')
+        
         # Labels are the last row of the training set.
-        labels = modshogun.MulticlassLabels(trainData[:, (trainData.shape[1] - 1)])
+        labels = MulticlassLabels(trainData[:, (trainData.shape[1] - 1)])
 
         with totalTimer:
+          trainFeat = RealFeatures(trainData[:,:-1].T)
+          testFeat = RealFeatures(testData.T)
 
-          model = modshogun.QDA(trainFeat, labels)
+          model = QDA(trainFeat, labels)
           model.train()
-          if len(self.dataset) == 2:
-            model.apply(testFeat).get_labels()
+          self.predictions = self.model.apply(testFeat)
+          
       except Exception as e:
         q.put(-1)
         return -1
@@ -109,15 +107,18 @@ class QDA(object):
       testData = LoadDataset(self.dataset[1])
       truelabels = LoadDataset(self.dataset[2])
 
-      model = modshogun.QDA(modshogun.RealFeatures(trainData.T),modshogun.MulticlassLabels(labels))
+      model = QDA(RealFeatures(trainData.T),MulticlassLabels(labels))
       model.train()
-      predictions = model.apply(modshogun.RealFeatures(testData.T)).get_labels()
+      predictions = model.apply_multiclass(RealFeatures(testData.T))
 
       confusionMatrix = Metrics.ConfusionMatrix(truelabels, predictions)
-      metrics['ACC'] = Metrics.AverageAccuracy(confusionMatrix)
-      metrics['MCC'] = Metrics.MCCMultiClass(confusionMatrix)
-      metrics['Precision'] = Metrics.AvgPrecision(confusionMatrix)
-      metrics['Recall'] = Metrics.AvgRecall(confusionMatrix)
-      metrics['MSE'] = Metrics.SimpleMeanSquaredError(truelabels, predictions)
+      metrics['Avg Accuracy'] = Metrics.AverageAccuracy(confusionMatrix)
+      metrics['MultiClass Precision'] = Metrics.AvgPrecision(confusionMatrix)
+      metrics['MultiClass Recall'] = Metrics.AvgRecall(confusionMatrix)
+      metrics['MultiClass FMeasure'] = Metrics.AvgFMeasure(confusionMatrix)
+      metrics['MultiClass Lift'] = Metrics.LiftMultiClass(confusionMatrix)
+      metrics['MultiClass MCC'] = Metrics.MCCMultiClass(confusionMatrix)
+      metrics['MultiClass Information'] = Metrics.AvgMPIArray(confusionMatrix, truelabels, self.predictions)
+      metrics['Simple MSE'] = Metrics.SimpleMeanSquaredError(truelabels, self.predictions)
 
     return metrics
