@@ -109,30 +109,34 @@ class NBC(object):
     metrics = {'Runtime' : results}
 
     if len(self.dataset) == 3:
-    # Check if the files to calculate the different metric are available.
-      testData = LoadDataset(self.dataset[1])
-      truelabels = LoadDataset(self.dataset[2])
-      probabilities = LoadDataset("shogun_probs.csv")
-      predictedlabels = LoadDataset("shogun_labels.csv")
+      # Check if we need to create a model.
+      if not self.model:
+        trainData, responses = SplitTrainData(self.dataset)
+        self.model = self.BuildModel(trainData, responses)
 
-      confusionMatrix = Metrics.ConfusionMatrix(truelabels, predictedlabels)
-      AvgAcc = Metrics.AverageAccuracy(confusionMatrix)
-      AvgPrec = Metrics.AvgPrecision(confusionMatrix)
-      AvgRec = Metrics.AvgRecall(confusionMatrix)
-      AvgF = Metrics.AvgFMeasure(confusionMatrix)
-      AvgLift = Metrics.LiftMultiClass(confusionMatrix)
-      AvgMCC = Metrics.MCCMultiClass(confusionMatrix)
-      AvgInformation = Metrics.AvgMPIArray(confusionMatrix, truelabels, predictedlabels)
-      SimpleMSE = Metrics.SimpleMeanSquaredError(truelabels, predictedlabels)
-      metric_results = (AvgAcc, AvgPrec, AvgRec, AvgF, AvgLift, AvgMCC, AvgInformation)
+      if self.predictions:
+        testData = LoadDataset(self.dataset[1])
+        truelabels = LoadDataset(self.dataset[2])
 
-      metrics['Avg Accuracy'] = AvgAcc
-      metrics['MultiClass Precision'] = AvgPrec
-      metrics['MultiClass Recall'] = AvgRec
-      metrics['MultiClass FMeasure'] = AvgF
-      metrics['MultiClass Lift'] = AvgLift
-      metrics['MultiClass MCC'] = AvgMCC
-      metrics['MultiClass Information'] = AvgInformation
-      metrics['Simple MSE'] = SimpleMSE
+        confusionMatrix = Metrics.ConfusionMatrix(truelabels, self.predictions)
+        AvgAcc = Metrics.AverageAccuracy(confusionMatrix)
+        AvgPrec = Metrics.AvgPrecision(confusionMatrix)
+        AvgRec = Metrics.AvgRecall(confusionMatrix)
+        AvgF = Metrics.AvgFMeasure(confusionMatrix)
+        AvgLift = Metrics.LiftMultiClass(confusionMatrix)
+        AvgMCC = Metrics.MCCMultiClass(confusionMatrix)
+        AvgInformation = Metrics.AvgMPIArray(confusionMatrix, truelabels, self.predictions)
+        SimpleMSE = Metrics.SimpleMeanSquaredError(truelabels, self.predictions)
+        metric_results = (AvgAcc, AvgPrec, AvgRec, AvgF, AvgLift, AvgMCC, AvgInformation)
+
+        metrics['Avg Accuracy'] = AvgAcc
+        metrics['MultiClass Precision'] = AvgPrec
+        metrics['MultiClass Recall'] = AvgRec
+        metrics['MultiClass FMeasure'] = AvgF
+        metrics['MultiClass Lift'] = AvgLift
+        metrics['MultiClass MCC'] = AvgMCC
+        metrics['MultiClass Information'] = AvgInformation
+        metrics['Simple MSE'] = SimpleMSE
+
 
     return metrics
