@@ -56,7 +56,7 @@ class RANDOMFOREST(object):
   '''
   def BuildModel(self, data, labels, options):
     mVote = MajorityVote()
-    randomForest = RandomForest(RealFeatures(data.T), MulticlassLabels(labels), self.numTrees)
+    randomForest = RandomForest(data, labels, self.numTrees)
     randomForest.set_combination_rule(mVote)
     randomForest.train()
 
@@ -121,8 +121,8 @@ class RANDOMFOREST(object):
        # Check if we need to create a model.
        if not self.model:
          trainData, responses = SplitTrainData(self.dataset)
-         self.model = self.BuildModel(trainData, responses, options)
-         self.predictions = self.model.apply_multiclass(testData)
+         self.model = self.BuildModel(RealFeatures(trainData.T), MulticlassLabels(labels), options)
+         self.predictions = self.model.apply_multiclass(RealFeatures(LoadDataset(self.dataset[1]).T))
         
        if self.predictions:
         testData = LoadDataset(self.dataset[1])
