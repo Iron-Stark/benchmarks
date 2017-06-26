@@ -76,7 +76,7 @@ class NBC(object):
           nbc.train()
 
           # Run Naive Bayes Classifier on the test dataset.
-          self.predictions = nbc.apply_multiclass(testFeat)
+          nbc.apply(testFeat).get_labels()
       except Exception as e:
         q.put(-1)
         return -1
@@ -109,26 +109,43 @@ class NBC(object):
     metrics = {'Runtime' : results}
 
     if len(self.dataset) == 3:
-      # Check if we need to create a model.
-      if not self.model:
-        trainData, responses = SplitTrainData(self.dataset)
-        self.model = self.BuildModel(trainData, responses, options)
-        self.predictions = self.model.apply_multiclass(RealFeatures(testData.T))
-      
-      if self.predictions:
-        testData = LoadDataset(self.dataset[1])
-        truelabels = LoadDataset(self.dataset[2])
+    # Check if the files to calculate the different metric are available.
+      cmd = shlex.split("methods/shogun/nbc " + self.dataset[0]
+           + " " + self.dataset[1])
+      if not CheckFileAvailable("shogun_labels.csv") or not CheckFileAvailable("shogun_probs.csv"):
+        try:
+          s = subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=False,
+              timeout=self.timeout)
+        except subprocess.TimeoutExpired as e:
+          Log.Warn(str(e))
+          return -2
+        except Exception as e:
+          Log.Fatal("Could not execute command: " + str(cmd))
+          return -1
 
-        confusionMatrix = Metrics.ConfusionMatrix(truelabels, self.predictions)
+      testData = LoadDataset(self.dataset[1])
+      truelabels = LoadDataset(self.dataset[2])
+      probabilities = LoadDataset("shogun_probs.csv")
+      predictedlabels = LoadDataset("shogun_labels.csv")
 
-        metrics['Avg Accuracy'] = Metrics.AverageAccuracy(confusionMatrix)
-        metrics['MultiClass Precision'] = Metrics.AvgPrecision(confusionMatrix)
-        metrics['MultiClass Recall'] = Metrics.AvgRecall(confusionMatrix)
-        metrics['MultiClass FMeasure'] = Metrics.AvgFMeasure(confusionMatrix)
-        metrics['MultiClass Lift'] = Metrics.LiftMultiClass(confusionMatrix)
-        metrics['MultiClass MCC'] = Metrics.MCCMultiClass(confusionMatrix)
-        metrics['MultiClass Information'] = Metrics.AvgMPIArray(confusionMatrix, truelabels, self.predictions)
-        metrics['Simple MSE'] = Metrics.SimpleMeanSquaredError(truelabels, self.predictions)
+      confusionMatrix = Metrics.ConfusionMatrix(truelabels, predictedlabels)
+      AvgAcc = Metrics.AverageAccuracy(confusionMatrix)
+      AvgPrec = Metrics.AvgPrecision(confusionMatrix)
+      AvgRec = Metrics.AvgRecall(confusionMatrix)
+      AvgF = Metrics.AvgFMeasure(confusionMatrix)
+      AvgLift = Metrics.LiftMultiClass(confusionMatrix)
+      AvgMCC = Metrics.MCCMultiClass(confusionMatrix)
+      AvgInformation = Metrics.AvgMPIArray(confusionMatrix, truelabels, predictedlabels)
+      SimpleMSE = Metrics.SimpleMeanSquaredError(truelabels, predictedlabels)
+      metric_results = (AvgAcc, AvgPrec, AvgRec, AvgF, AvgLift, AvgMCC, AvgInformation)
 
+      metrics['Avg Accuracy'] = AvgAcc
+      metrics['MultiClass Precision'] = AvgPrec
+      metrics['MultiClass Recall'] = AvgRec
+      metrics['MultiClass FMeasure'] = AvgF
+      metrics['MultiClass Lift'] = AvgLift
+      metrics['MultiClass MCC'] = AvgMCC
+      metrics['MultiClass Information'] = AvgInformation
+      metrics['Simple MSE'] = SimpleMSE
 
     return metrics
