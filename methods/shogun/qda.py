@@ -106,12 +106,8 @@ class QDA(object):
       trainData, labels = SplitTrainData(self.dataset)
       testData = LoadDataset(self.dataset[1])
       truelabels = LoadDataset(self.dataset[2])
-
-      model = QDA(RealFeatures(trainData.T),MulticlassLabels(labels))
-      model.train()
-      predictions = model.apply_multiclass(RealFeatures(testData.T))
-
-      confusionMatrix = Metrics.ConfusionMatrix(truelabels, predictions)
+      
+      confusionMatrix = Metrics.ConfusionMatrix(truelabels, self.predictions)
       metrics['Avg Accuracy'] = Metrics.AverageAccuracy(confusionMatrix)
       metrics['MultiClass Precision'] = Metrics.AvgPrecision(confusionMatrix)
       metrics['MultiClass Recall'] = Metrics.AvgRecall(confusionMatrix)
