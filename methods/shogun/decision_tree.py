@@ -113,11 +113,6 @@ class DTC(object):
     metrics = {'Runtime' : results}
 
     if len(self.dataset) >= 3:
-      # Check if we need to create a model.
-      if not self.model:
-        trainData, responses = SplitTrainData(self.dataset)
-        self.model = self.BuildModel(trainData, responses, options)
-        self.predictions = self.model.apply_multiclass(RealFeatures(LoadDataset(self.dataset[1]).T))
       
       if self.predictions:
         testData = LoadDataset(self.dataset[1])
