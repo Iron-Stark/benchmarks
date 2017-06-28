@@ -120,8 +120,6 @@ class LogisticRegression(object):
     Log.Info("Perform Logistic Regression.", self.verbose)
 
     results = self.LogisticRegressionShogun(options)
-    if results < 0:
-      return results
 
     metrics = {'Runtime' : results}
 
