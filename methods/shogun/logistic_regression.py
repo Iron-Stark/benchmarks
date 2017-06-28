@@ -128,15 +128,15 @@ class LogisticRegression(object):
           testData = LoadDataset(self.dataset[1])
           truelabels = LoadDataset(self.dataset[2])
       
-        confusionMatrix = Metrics.ConfusionMatrix(truelabels, self.predictions)
+          confusionMatrix = Metrics.ConfusionMatrix(truelabels, self.predictions)
 
-        metrics['Avg Accuracy'] = Metrics.AverageAccuracy(confusionMatrix)
-        metrics['MultiClass Precision'] = Metrics.AvgPrecision(confusionMatrix)
-        metrics['MultiClass Recall'] = Metrics.AvgRecall(confusionMatrix)
-        metrics['MultiClass FMeasure'] = Metrics.AvgFMeasure(confusionMatrix)
-        metrics['MultiClass Lift'] = Metrics.LiftMultiClass(confusionMatrix)
-        metrics['MultiClass MCC'] = Metrics.MCCMultiClass(confusionMatrix)
-        metrics['MultiClass Information'] = Metrics.AvgMPIArray(confusionMatrix, truelabels, self.predictions)
-        metrics['Simple MSE'] = Metrics.SimpleMeanSquaredError(truelabels, self.predictions)
+          metrics['Avg Accuracy'] = Metrics.AverageAccuracy(confusionMatrix)
+          metrics['MultiClass Precision'] = Metrics.AvgPrecision(confusionMatrix)
+          metrics['MultiClass Recall'] = Metrics.AvgRecall(confusionMatrix)
+          metrics['MultiClass FMeasure'] = Metrics.AvgFMeasure(confusionMatrix)
+          metrics['MultiClass Lift'] = Metrics.LiftMultiClass(confusionMatrix)
+          metrics['MultiClass MCC'] = Metrics.MCCMultiClass(confusionMatrix)
+          metrics['MultiClass Information'] = Metrics.AvgMPIArray(confusionMatrix, truelabels, self.predictions)
+          metrics['Simple MSE'] = Metrics.SimpleMeanSquaredError(truelabels, self.predictions)
 
     return metrics
