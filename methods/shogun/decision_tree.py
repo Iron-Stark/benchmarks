@@ -116,7 +116,7 @@ class DTC(object):
       # Check if we need to create a model.
       if not self.model:
         trainData, responses = SplitTrainData(self.dataset)
-        self.model = self.BuildModel(trainData, responses)
+        self.model = self.BuildModel(trainData, responses, options)
         self.predictions = self.model.apply_multiclass(RealFeatures(LoadDataset(self.dataset[1]).T))
       
       if self.predictions:
