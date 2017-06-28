@@ -124,6 +124,10 @@ class LogisticRegression(object):
 
     if len(self.dataset) >= 3:
       
+        if self.predictions:
+          testData = LoadDataset(self.dataset[1])
+          truelabels = LoadDataset(self.dataset[2])
+      
         confusionMatrix = Metrics.ConfusionMatrix(truelabels, self.predictions)
 
         metrics['Avg Accuracy'] = Metrics.AverageAccuracy(confusionMatrix)
