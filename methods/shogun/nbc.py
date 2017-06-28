@@ -109,12 +109,6 @@ class NBC(object):
     metrics = {'Runtime' : results}
 
     if len(self.dataset) == 3:
-      # Check if we need to create a model.
-      if not self.model:
-        trainData, responses = SplitTrainData(self.dataset)
-        nbc = GaussianNaiveBayes(trainFeat, labels)
-        nbc.train()
-        self.predictions = nbc.apply_multiclass(RealFeatures(testData.T))
       
       if self.predictions:
         testData = LoadDataset(self.dataset[1])
