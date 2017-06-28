@@ -95,8 +95,7 @@ class LogisticRegression(object):
           self.model.train()
 
           if len(self.dataset) > 1:
-            pred = self.model.apply(RealFeatures(testSet.T))
-            self.predictions = pred.get_labels()
+            self.predictions = self.model.apply_multiclass(RealFeatures(testSet.T))
 
       except Exception as e:
         q.put(-1)
@@ -124,15 +123,7 @@ class LogisticRegression(object):
     metrics = {'Runtime' : results}
 
     if len(self.dataset) >= 3:
-      # Check if we need to create a model.
-      if not self.model:
-        trainData, responses = SplitTrainData(self.dataset)
-        self.model = self.BuildModel(trainData, responses)
-
-      if self.predictions:
-        testData = LoadDataset(self.dataset[1])
-        truelabels = LoadDataset(self.dataset[2])
-
+      
         confusionMatrix = Metrics.ConfusionMatrix(truelabels, self.predictions)
 
         metrics['Avg Accuracy'] = Metrics.AverageAccuracy(confusionMatrix)
