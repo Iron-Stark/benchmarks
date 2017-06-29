@@ -97,33 +97,27 @@ class NBC(object):
   '''
   def RunMetrics(self, options):
     Log.Info("Perform NBC.", self.verbose)
-
-    if len(self.dataset) != 2:
-      Log.Fatal("This method requires two datasets.")
-      return -1
-
+    
     results = self.NBCShogun(options)
     if results < 0:
       return results
 
     metrics = {'Runtime' : results}
 
-    if len(self.dataset) == 3:
+    if len(self.dataset) >= 3:
+      trainData, labels = SplitTrainData(self.dataset)
+      testData = LoadDataset(self.dataset[1])
+      truelabels = LoadDataset(self.dataset[2])
       
-      if self.predictions:
-        testData = LoadDataset(self.dataset[1])
-        truelabels = LoadDataset(self.dataset[2])
-
-        confusionMatrix = Metrics.ConfusionMatrix(truelabels, self.predictions)
-
-        metrics['Avg Accuracy'] = Metrics.AverageAccuracy(confusionMatrix)
-        metrics['MultiClass Precision'] = Metrics.AvgPrecision(confusionMatrix)
-        metrics['MultiClass Recall'] = Metrics.AvgRecall(confusionMatrix)
-        metrics['MultiClass FMeasure'] = Metrics.AvgFMeasure(confusionMatrix)
-        metrics['MultiClass Lift'] = Metrics.LiftMultiClass(confusionMatrix)
-        metrics['MultiClass MCC'] = Metrics.MCCMultiClass(confusionMatrix)
-        metrics['MultiClass Information'] = Metrics.AvgMPIArray(confusionMatrix, truelabels, self.predictions)
-        metrics['Simple MSE'] = Metrics.SimpleMeanSquaredError(truelabels, self.predictions)
+      confusionMatrix = Metrics.ConfusionMatrix(truelabels, self.predictions)
+      metrics['Avg Accuracy'] = Metrics.AverageAccuracy(confusionMatrix)
+      metrics['MultiClass Precision'] = Metrics.AvgPrecision(confusionMatrix)
+      metrics['MultiClass Recall'] = Metrics.AvgRecall(confusionMatrix)
+      metrics['MultiClass FMeasure'] = Metrics.AvgFMeasure(confusionMatrix)
+      metrics['MultiClass Lift'] = Metrics.LiftMultiClass(confusionMatrix)
+      metrics['MultiClass MCC'] = Metrics.MCCMultiClass(confusionMatrix)
+      metrics['MultiClass Information'] = Metrics.AvgMPIArray(confusionMatrix, truelabels, self.predictions)
+      metrics['Simple MSE'] = Metrics.SimpleMeanSquaredError(truelabels, self.predictions)
 
 
     return metrics
