@@ -45,6 +45,7 @@ class NBC(object):
     self.verbose = verbose
     self.dataset = dataset
     self.timeout = timeout
+    self.predictions = None
 
   '''
   Use the shogun libary to implement Naive Bayes Classifier.
@@ -106,19 +107,8 @@ class NBC(object):
 
     if len(self.dataset) >= 3:
       
-      trainData, labels = SplitTrainData(self.dataset)
-      testData = LoadDataset(self.dataset[1])
       truelabels = LoadDataset(self.dataset[2])
-      trainFeat = RealFeatures(trainData[:,:-1].T)
-      testFeat = RealFeatures(testData.T)
-      # Create and train the classifier.
-      
-      nbc = GaussianNaiveBayes(trainFeat, labels)
-      nbc.train()
-      
-      # Run Naive Bayes Classifier on the test dataset.
-      self.predictions = nbc.apply_multiclass(testFeat)
-      
+
       confusionMatrix = Metrics.ConfusionMatrix(truelabels, self.predictions)
       
       metrics['Avg Accuracy'] = Metrics.AverageAccuracy(confusionMatrix)
