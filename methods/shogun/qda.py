@@ -63,7 +63,11 @@ class QDA(object):
         # Load train and test dataset.
         trainData = np.genfromtxt(self.dataset[0], delimiter=',')
         testData = np.genfromtxt(self.dataset[1], delimiter=',')
-        
+
+        if len(options) > 0:
+          Log.Fatal("Unknown parameters: " + str(options))
+          raise Exception("unknown parameters")
+
         # Labels are the last row of the training set.
         labels = MulticlassLabels(trainData[:, (trainData.shape[1] - 1)])
 
@@ -106,7 +110,13 @@ class QDA(object):
       trainData, labels = SplitTrainData(self.dataset)
       testData = LoadDataset(self.dataset[1])
       truelabels = LoadDataset(self.dataset[2])
-      
+      labels = MulticlassLabels(trainData[:, (trainData.shape[1] - 1)])
+      trainFeat = RealFeatures(trainData[:,:-1].T)
+      testFeat = RealFeatures(testData.T)
+      model = QDA(trainFeat, labels)
+      model.train()
+      self.predictions = self.model.apply(testFeat).get_labels()
+
       confusionMatrix = Metrics.ConfusionMatrix(truelabels, self.predictions)
       metrics['Avg Accuracy'] = Metrics.AverageAccuracy(confusionMatrix)
       metrics['MultiClass Precision'] = Metrics.AvgPrecision(confusionMatrix)

@@ -46,7 +46,7 @@ class QDA_SHOGUN_TEST(unittest.TestCase):
   Test the 'RunMetrics' function.
   '''
   def test_RunMetrics(self):
-    result = self.instance.RunMetrics("")
+    result = self.instance.RunMetrics({})
     self.assertTrue(result["Runtime"] > 0)
     self.assertTrue(result["Avg Accuracy"] > 0)
     self.assertTrue(result["MultiClass Precision"] > 0)
@@ -83,8 +83,8 @@ class QDA_SCIKIT_TEST(unittest.TestCase):
   Test the 'RunTiming' function.
   '''
   def test_RunTiming(self):
-    result = self.instance.RunTiming("")
-    self.assertTrue(result > 0)
+    result = self.instance.RunMetrics({})
+    self.assertTrue(result["Runtime"] > 0)
 
 
 if __name__ == '__main__':
