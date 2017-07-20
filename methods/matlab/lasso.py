@@ -1,6 +1,5 @@
 '''
   @file lasso.py
-  @author Marcus Edel
   Class to benchmark the matlab lasso method.
 '''
 
@@ -61,11 +60,16 @@ class LASSO(object):
     Log.Info("Perform Lasso.", self.verbose)
 
     # No options accepted for this task.
+    if "tolerance" in options:
+      opts["tol"] = float(options.pop("tolerance"))
+    if "max_iterations" in options:
+      opts["max_iter"] = int(options.pop("max_iterations"))
     if len(options) > 0:
       Log.Fatal("Unknown parameters: " + str(options))
       raise Exception("unknown parameters")
 
-    inputCmd = "-t " + self.dataset[0] + " -T " + self.dataset[1] 
+    inputCmd = "-t " + self.dataset[0] + " -T " + self.dataset[1] + " -m " + str(
+      opts["max_iter"]) + " -t " + str(opts["tol"]) 
     # Split the command using shell-like syntax.
     cmd = shlex.split(self.path + "matlab -nodisplay -nosplash -r \"try, LASSO('"
         + inputCmd + "'), catch, exit(1), end, exit(0)\"")
