@@ -69,7 +69,7 @@ class LASSO(object):
       raise Exception("unknown parameters")
 
     inputCmd = "-t " + self.dataset[0] + " -T " + self.dataset[1] + " -m " + str(
-      opts["max_iter"]) + " -t " + str(opts["tol"]) 
+      opts["max_iter"]) + " -tol " + str(opts["tol"]) 
     # Split the command using shell-like syntax.
     cmd = shlex.split(self.path + "matlab -nodisplay -nosplash -r \"try, LASSO('"
         + inputCmd + "'), catch, exit(1), end, exit(0)\"")
